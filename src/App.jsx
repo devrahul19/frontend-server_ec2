@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
+import { useState } from 'react';
 import './App.css';
-
 
 export default function Signup() {
   const {
@@ -8,15 +8,33 @@ export default function Signup() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  
+  const [message, setMessage] = useState('');
 
-  const onSubmit = (data) => {
-    console.log('Signup Data:', data);
+  const onSubmit = async (data) => {
+    try {
+      const response = await fetch('http://localhost:4000/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        setMessage(result.message);
+      } else {
+        setMessage(result.message || 'Signup failed');
+      }
+    } catch (error) {
+      setMessage('An error occurred. Please try again.');
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 p-4">
       <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
         <h2 className="text-center text-3xl font-extrabold text-gray-800">Create an Account</h2>
+        {message && <p className="text-center text-lg text-green-600 mt-2">{message}</p>}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6 w-full">
           <div>
             <input
