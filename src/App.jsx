@@ -1,72 +1,64 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Import missing dependencies
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
+import { useForm } from 'react-hook-form';
 import './App.css';
 
-const handleSignup = async (event, setAlert, navigate) => {
-  event.preventDefault(); // Prevent default form submission
 
-  const name = event.target.name.value;
-  const email = event.target.email.value;
-  const password = event.target.password.value;
+export default function Signup() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-  try {
-    const response = await fetch('http://localhost:3000/api/auth/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name, email, password }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      localStorage.setItem('authToken', data.token);
-      setAlert({ message: 'Sign Up successful!', type: 'success' });
-      navigate('/dashboard'); // Navigate to the dashboard
-    } else {
-      setAlert({ message: 'Sign Up failed: ' + (data.message || 'Unknown error'), type: 'error' });
-    }
-  } catch (error) {
-    console.error('Network error:', error);
-    setAlert({ message: 'Network error, please try again later', type: 'error' });
-  }
-};
-
-function App() {
-  const [alert, setAlert] = useState(null); // State for displaying alerts
-  const navigate = useNavigate(); // Correctly initialize useNavigate
+  const onSubmit = (data) => {
+    console.log('Signup Data:', data);
+  };
 
   return (
-    <div className="signup-wrapper">
-      <div className="signup-container">
-        <div className="form-box">
-          <h2>Sign Up</h2>
-          {alert && <p className={`alert ${alert.type}`}>{alert.message}</p>}
-          <form onSubmit={(e) => handleSignup(e, setAlert, navigate)}>
-            <div className="input-group">
-              <input type="text" name="name" required />
-              <label>Full Name</label>
-            </div>
-            <div className="input-group">
-              <input type="email" name="email" required />
-              <label>Email</label>
-            </div>
-            <div className="input-group">
-              <input type="password" name="password" required />
-              <label>Password</label>
-            </div>
-            <button type="submit" className="btn">Sign Up</button>
-            <p className="toggle-text">
-              Already have an account? <Link to="/login">Login</Link>
-            </p>
-          </form>
-        </div>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 p-4">
+      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+        <h2 className="text-center text-3xl font-extrabold text-gray-800">Create an Account</h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6 w-full">
+          <div>
+            <input
+              type="text"
+              placeholder="Full Name"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              {...register('name', { required: 'Name is required' })}
+            />
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+          </div>
+          <div>
+            <input
+              type="email"
+              placeholder="Email Address"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              {...register('email', {
+                required: 'Email is required',
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: 'Invalid email address',
+                },
+              })}
+            />
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+          </div>
+          <div>
+            <input
+              type="password"
+              placeholder="Password"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              {...register('password', { required: 'Password is required' })}
+            />
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white p-3 rounded-lg font-semibold hover:opacity-90 transition"
+          >
+            Sign Up
+          </button>
+        </form>
       </div>
     </div>
   );
 }
-
-export default App;
