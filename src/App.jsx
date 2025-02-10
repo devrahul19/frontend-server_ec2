@@ -8,12 +8,12 @@ export default function Signup() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  
+
   const [message, setMessage] = useState('');
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch('http://localhost:4000/signup', {
+      const response = await fetch('http://18.207.115.252:4000/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
